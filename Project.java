@@ -1,30 +1,69 @@
 public class Project
 {
 
+/*
+class Hébergement
+  id // clé
+  char type // Appartement, Gite, Chambre
+  capcité // Combien de personne
+  Ville // Nom
+  Tarif // int(4)
+*/
+
     static public int connect()
     {
-        return BD.ouvrirConnexion("172.20.128.64", "silvert_bd", "silvert", "silvert");
+        return BD.ouvrirConnexion("172.20.128.64", "silvert_BD", "silvert", "silvert");
     }
 
     static public void main( String Args[] )
     {
-	int connection = connect();;
-	Ecran.afficherln("Connection : ",connection);
-	if(connection != -1)
+	int connexion = connect();
+	Ecran.afficherln("connexion : ",connexion);
+	if(connexion != -1)
 	    {
-		// (coucou-hello-18ans)-(cava-hola-19ans)
-		int res = BD.executerSelect(connection,"SELECT * FROM message");
-		while(BD.suivant(res))
-		      {
-			  String message = BD.attributString(res,"msgTexte");
-			  String pseudo = BD.attributString(res,"msgPseudo");
-			  long date = BD.attributLong(res,"msgDate");
-			  Ecran.afficherln(BD.heures(date),":",BD.minutes(date),":",BD.secondes(date)," - ",pseudo," : ",message);
-		      }
-		BD.fermerResultat(res);
-		BD.fermerConnexion(connection);
+                /// ACCUEIL
+                //Menu
+                // 1 - Saisir un nouvel hébergement
+                // 2 - Cherche un hébergement selon critères
+                // 3 - Réservation pour une période
+                // ADMIN
+                // 4 
+                // 5 
+                ///////////////////////
+                
+            /*
+            swtich(menu)
+            case 1 
+            case 2
+            case 3             
+            */
+            
+            /*
+            case 1 : saisirNouveau() 
+              \def 
+              Demander un structure hébergement (avec tous ses champs) et envoyé ça à la BD
+                Crée une requête du style ADD
+            */
+            
+            /*
+            case 2 : chercher() 
+              \def 
+                Demander les critères de sélection, et afficher une requête SELECT
+            */
+            
+            /*
+            case 3 : reserver() 
+              \def 
+               Demander la période, crée une requête du style SELECT pour la validé et ADD pour la réservation 
+            */
+            
+            
+            
+		//BD.fermerResultat(res);
+		BD.fermerConnexion(connexion);
 	    }
 	Ecran.afficherln("Good bye ! ");
+        BD.fermerConnexion(connexion);
 	
 
     }
@@ -32,7 +71,7 @@ public class Project
 }
 
 	/* TUTORIAL 
-	int maConnection = BD.ouvrirConnexion(String adresse, String nom_bd, String login, String password);
+	int maconnexion = BD.ouvrirConnexion(String adresse, String nom_bd, String login, String password);
 
 	void BD.fermerConnexion(int connexion);
 
