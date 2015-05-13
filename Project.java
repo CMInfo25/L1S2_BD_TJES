@@ -7,17 +7,17 @@ public class Project
     
     
     static class Hebergement
-    // Sert à manipuler des enregistrement de le table HEBERGEMENT
+    // Sert a manipuler des enregistrement de le table HEBERGEMENT
     {
 	int id= -1;
-	int type = 0;
+	String type = "x";
 	short capacite = -1;
 	String ville = "error";
 	short tarif = -1 ;
     }
 
     static class RechercheVersReserve
-    // Sert à transferer les donnees necessaire depuis une recherche vers une reservation
+    // Sert a transferer les donnees necessaire depuis une recherche vers une reservation
     {
 	int res = -1;
 	long arrivee = -1;
@@ -25,7 +25,7 @@ public class Project
     }
 
     static class UtilisateurConnecte
-    // Sert à identifier un utilisateur dans le code
+    // Sert a identifier un utilisateur dans le code
     {
 	int connexion = -1;
 	String login = "error";
@@ -68,7 +68,7 @@ public class Project
 				    + ")"
 				    );
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 	Ecran.afficherln (" SELECT reID"
 				    + " FROM RESERVATION "
 				    + " WHERE reID >= ALL("
@@ -97,15 +97,15 @@ public class Project
 	
 	// RECHERCHE DU PLUS GRAND ID
 	int res = BD.executerSelect(connexion, " SELECT heID"
-				    + " FROM HEBERGEMENT "
+				    + " FROM HEBERGEMENT AS H "
 				    + " WHERE heID >= ALL("
 				    + " SELECT heID "
-				    + " FROM HEBERGEMENT " 
+				    + " FROM HEBERGEMENT AS H2 " 
 				    + ")"
 				    );
 
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 	Ecran.afficherln (" SELECT heID"
 			  + " FROM HEBERGEMENT "
 			  + " WHERE heID >= ALL("
@@ -118,6 +118,7 @@ public class Project
 
 
 	// ON RETIENT LE DERNIER ID EXISTANT
+        BD.suivant(res);
 	int dernierID = BD.attributInt(res, "heID");
 
 	// LIBERATION
@@ -134,18 +135,11 @@ public class Project
     /*      FONCTION AFFICHAGE CONSOLE          */
     /* ======================================== */
 
-    static public void afficherHebergement(int id, int enuma, int capacite, String ville, int tarif)
+    static public void afficherHebergement(int id, String enuma, int capacite, String ville, int tarif)
     // Afficher un hebergement depuis ses donnees
     {
 	Ecran.afficherln(" Reservation ID : ", id);
-	Ecran.afficher(" Type : ");
-	switch(enuma)
-	    {
-	    case 0 : Ecran.afficher("gite"); break;
-	    case 1 : Ecran.afficher("appartement"); break;
-	    case 2 : Ecran.afficher("chambre"); break;
-	    default : Ecran.afficher("Inconnu (probablement un endroit melant l'espace et le temps brisant leur continum...)"); break;
-	    }
+	Ecran.afficher(" Type : ", enuma);
 	Ecran.afficherln(" \n Capacite : ", capacite);
 	Ecran.afficherln(" Ville de : " , ville);
 	Ecran.afficherln(" Tarif : " , tarif ) ;
@@ -162,7 +156,7 @@ public class Project
     {
 	afficherHebergement(
 			     BD.attributInt(res, "heID"),
-			     BD.attributInt(res, "heType"),
+			     BD.attributString(res, "heType"),
 			     BD.attributInt(res, "heCapacite"),
 			     BD.attributString(res, "heVille"),
 			     BD.attributInt(res, "heTarif")
@@ -188,8 +182,8 @@ public class Project
 	       
 	// TYPE
 	Ecran.afficherln(" Veuillez saisir le type (0 - 2) de l'hebergement :");
-	Ecran.afficher(" 0 - Gite \n 1 - Appartement \n 2 - Maison \n");
-	nouveau.type = Clavier.saisirInt();
+	Ecran.afficher(" - Gite \n - Appartement \n - Maison \n");
+	nouveau.type = Clavier.saisirString();
 	       
 	// CAPACITY
 	Ecran.afficherln(" Veuillez saisir la capacite de l'hebergement");
@@ -213,14 +207,14 @@ public class Project
 	reponse = Clavier.saisirChar();
 	       
 	if (reponse == 'o');
-	// On souhaite ajouter à la table
+	// On souhaite ajouter a la table
 	{
 
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 	    Ecran.afficherln ("INSERT INTO HEBERGEMENT VALUES(" 
 			      + "'" + Integer.toString(nouveau.id) + "'" + "," 
-			      + "'" + Integer.toString(nouveau.type) + "'" + "," 
+			      + "'" + nouveau.type + "'" + "," 
 			      + "'" + Short.toString(nouveau.capacite) + "'" + "," 
 			      + "'" + nouveau.ville + "'" 
 			      + "," + nouveau.tarif 
@@ -235,7 +229,7 @@ public class Project
 	       BD.executerUpdate(connexion,
 				 "INSERT INTO HEBERGEMENT VALUES(" 
 				 + "'" + Integer.toString(nouveau.id) + "'" + "," 
-				 + "'" + Integer.toString(nouveau.type) + "'" + "," 
+				 + "'" + nouveau.type + "'" + "," 
 				 + "'" + Short.toString(nouveau.capacite) + "'" + "," 
 				 + "'" + nouveau.ville + "'" 
 				 + "," + nouveau.tarif 
@@ -255,13 +249,13 @@ public class Project
 	}
 }
     
-    static public RechercheVersReserve rechercher(int connexion)
+    static public RechercheVersReserve rechercherHebergement(int connexion)
     // Execute une recherche dans la table selon les criteres de l'utilisateur et renvoie le resultat de la recherche.
     {
 	RechercheVersReserve results = new RechercheVersReserve();
 
 	// SAISIE DE LA RESERVATION
-	Ecran.afficherln(" ====== RESERVATION ===== ");
+	Ecran.afficherln(" ====== RECHERCHE D'HEBERGEMENT ===== ");
 	Ecran.afficher(" Saisir la date d'arrivee que vous souhaitez ");
 
 	// ANNEE
@@ -289,7 +283,7 @@ public class Project
 	results.depart = BD.date(jour + dureeJ, mois, annee, heure, 0, 0);
 	
 	// VERIFICATION DE LA DISPONIBILITE
-	String requete = " SELECT HEBERGEMENT.* "
+	String requete = " SELECT * "
 	    + " FROM  HEBERGEMENT AS H "
 	    + " WHERE NOT EXISTS ( "
 	    + " SELECT * "
@@ -299,7 +293,7 @@ public class Project
 	    + " AND reDateDepart  <= " + Long.toString(results.depart) 
 	    + ")";
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 	    Ecran.afficherln (requete);
 	/* */
 
@@ -324,15 +318,15 @@ public class Project
 
     }
 
-    static public void reserver(int connexion)
+    static public void reserver(UtilisateurConnecte user)
     // Recherche des hebergements (pour avoir l'ID de celui qu'on veut) et lance le processus de reservation.
     {
 	/// SECURITE
-	if(!verifieConnexion(connexion))return;
+	if(!verifieConnexion(user.connexion))return;
 
 	// RECHERCHE DES HEBERGEMENTS CORRESPONDANTS AUX CRITERES
 	RechercheVersReserve recherche;
-	recherche = rechercher(connexion);
+	recherche = rechercherHebergement(user.connexion);
 
 	// S'IL EXISTE DES RESULTATS
 	if( recherche.res == -1)
@@ -346,26 +340,26 @@ public class Project
 		int id = Clavier.saisirInt();
 
 		// VERIFICATION DE RESERVATION POSSIBLE
-		int dejaPris = BD.executerSelect(connexion,
+		int dejaPris = BD.executerSelect(user.connexion,
 						 "SELECT * " 
 						 + " FROM RESERVATION as R " 
 						 + " WHERE reID = " 
 						 + Integer.toString(id) 
 						 + " AND reDateArrivee >= " + Long.toString(recherche.arrivee) 
-						 + " AND reDateArrivee <= " +  Long.toString(recherche.depart) + ")" 
+						 + " AND reDateArrivee <= " +  Long.toString(recherche.depart) 
 						 );
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 		Ecran.afficherln ("SELECT * " 
 				  + " FROM RESERVATION as R " 
 				  + " WHERE reID = " 
 				  + Integer.toString(id) 
 				  + " AND reDateArrivee >= " + Long.toString(recherche.arrivee) 
-				  + " AND reDateArrivee <= " +  Long.toString(recherche.depart) + ")" );
+				  + " AND reDateArrivee <= " +  Long.toString(recherche.depart) );
 	/* */
 
 
-		if( dejaPris != -1 ) 
+		if( BD.suivant(dejaPris) ) 
 		    // RESERVATION IMPOSSIBLE CAR DEJA PRISE
 		    {
 			Ecran.afficherln (" C'est embarassant, il a du y avoir une erreur, cette reservation est deja prise. Nos excuses.");
@@ -375,10 +369,10 @@ public class Project
 		    {
 
 
-			/* ENLEVE LE */
+			/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 			Ecran.afficherln ("INSERT INTO RESERVATION VALUES(" 
-					  + "'" + Integer.toString(nouvelIDReservation(connexion)) + "'" 
-					  + "," + "DIEU" + "," 
+					  + "'" + Integer.toString(nouvelIDReservation(user.connexion)) + "'" 
+					  + "," + user.login + "," 
 					  + Integer.toString(id) 
 					  + "," + Long.toString(recherche.arrivee) + "," 
 					  + Long.toString(recherche.depart) + ")"
@@ -386,10 +380,10 @@ public class Project
 		        /* */
 
 
-			if(BD.executerUpdate(connexion,
+			if(BD.executerUpdate(user.connexion,
 					     "INSERT INTO RESERVATION VALUES(" 
-					     + "'" + Integer.toString(nouvelIDReservation(connexion)) + "'" 
-					     + "," + "DIEU" + "," 
+					     + "'" + Integer.toString(nouvelIDReservation(user.connexion)) + "'" 
+					     + ",'" + user.login + "'," 
 					     + Integer.toString(id) 
 					     + "," + Long.toString(recherche.arrivee) + "," 
 					     + Long.toString(recherche.depart) + ")"
@@ -416,8 +410,7 @@ public class Project
 
     static public int connect()
     {
-	return 2; // ENLEVE LE ! 
-	//	return BD.ouvrirConnexion("172.20.128.64", "silvert_BD", "silvert", "silvert");
+	return BD.ouvrirConnexion("172.20.128.64", "silvert_BD", "silvert", "silvert");
     }
 
     
@@ -479,7 +472,7 @@ public class Project
 				 + " AND utPassword = " +  "'" + motdepasse +  "'" 
 				    );
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 	Ecran.afficherln ("SELECT * "
 			  + " FROM UTILISATEUR "
 			  + " WHERE utLogin = " + "'" + user.login + "'" 
@@ -487,10 +480,10 @@ public class Project
 			  );
 	/* */
 
-	if(res != -1) 
+	if(BD.suivant(res))  
 	    {
-		Ecran.afficherln(" Bienvenue à vous " + BD.attributString(res, "utPrenom") + " " + BD.attributString(res, "utNom"));
-		user.administrateur = ( BD.attributInt(res, "utRole") == 0 );
+		Ecran.afficherln(" Bienvenue a vous " + BD.attributString(res, "utPrenom") + " " + BD.attributString(res, "utNom"));
+		user.administrateur = ( BD.attributString(res, "utRole").equals("admin") ); 
 		BD.fermerResultat(res);
 		return true;
 	    }
@@ -511,22 +504,22 @@ public class Project
 	
 	// Verification
         int res = BD.executerSelect(user.connexion, 
-				    "SELECT * "
+				    "SELECT utLogin "
 				    + " FROM UTILISATEUR "
 				    + " WHERE utLogin = " +  "'" + user.login + "'" 
 				    );
 
-	/* ENLEVE LE */
+	/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */ 
 	Ecran.afficherln ("SELECT * "
 			  + " FROM UTILISATEUR "
 			  + " WHERE utLogin = " +  "'" + user.login + "'" 
 			  );
 	/* */
 
-	if(res != -1) 
+	if(BD.suivant(res))  
 	    // EXISTE DEJA
 	    {
-		Ecran.afficherln(" Cet utilisateur existe déjà, veuillez reiterer.");
+		Ecran.afficherln(" Cet utilisateur existe deja, veuillez reiterer.");
 		return false;
 	    }
 	else
@@ -547,9 +540,10 @@ public class Project
 
 		// ADMINISTRATEUR
 		Ecran.afficherln(" Pour etre considere comme administrateur, veuillez saisir le mot de pass ROOT, autrement appuyez sur entree.");
-		boolean admin = (Clavier.saisirString() == "admin");
-		String Sadmin = (admin == true) ? "0" : "1";
-		/* ENLEVE LE */
+		user.administrateur = (Clavier.saisirString().equals("admin"));
+		String Sadmin = (user.administrateur == true) ? "0" : "1";
+
+		/* AFFICHAGE DE LA REQUETE POUR MEILLEURE CORRECTION */
 		Ecran.afficherln (" INSERT INTO UTILISATEUR VALUES ("
 				     +  "'" + user.login +  "'" + ","
 				     +  "'" + motdepasse +  "'" + ","
@@ -583,6 +577,73 @@ public class Project
 	    }
     }
 
+  static public void regarderReservation(int connexion)
+  // Note au correcteur : cette fonction n'a pas pu etre experimentee car aucun acces au serveur lors de sa creation et des lors.
+    {
+	// security
+	if(!verifieConnexion(connexion))return;
+
+	int res = BD.executerSelect(
+				    connexion, "SELECT * "
+				    + " FROM RESERVATION"
+				    + " WHERE reDateArrivee >= " Long.toString(BD.maintenant())
+
+);
+	
+	boolean details = false;
+	Ecran.afficherln("Voulez-vous un detail des hebergements ? Autrement vous n'aurez que l'ID de l'hebergement. Tapez 'o' pour oui.");
+	details = (Clavier.saisirString() == 'o');
+
+	while(BD.suivant(res))
+	    {
+		// date d'arrivee
+		int Ajour = BD.jour(BD.attributLong(res, "reDateArrivee"));
+		int Amois = BD.mois(BD.attributLong(res, "reDateArrivee"));
+		int Aannee = BD.annee(BD.attributLong(res, "reDateArrivee"));
+		int Aheure = BD.heures(BD.attributLong(res, "reDateArrivee"));
+
+		// date de depart
+		int Djour = BD.jour(BD.attributLong(res, "reDateDepart"));
+		int Dmois = BD.mois(BD.attributLong(res, "reDateDepart"));
+		int Dannee = BD.annee(BD.attributLong(res, "reDateDepart"));
+		int Dheure = BD.heures(BD.attributLong(res, "reDateDepart"));
+
+		Ecran.afficherln(" =============== ");
+
+		if(details)
+		    {
+			int resHebergement = BD.select(connexion, "SELECT * FROM HEBERGEMENT WHERE heID = ", Integer.toString(BD.attributInt(res, "reID")));
+			afficherHebergement(resHebergement);
+		    }
+		else
+		    {
+			Ecran.afficherln(" ID de reservation : ", Integer.toString(BD.attributInt(res, "reID")));
+		    }
+
+		Ecran.afficherln(" Utilisateur qui a reserve : ", BD.attributString(res, "reUtilisateur"));
+
+		Ecran.afficherln(" ID de l'hebergement : ", Integer.toString(BD.attributInt(res, "reHebergement")));
+
+		Ecran.afficherln(" Date d'arrivee : ", 
+				 Integer.toString(Aheure), "h le ",   
+				 Integer.toString(Ajour), " - ", 
+				 Integer.toString(Amois), " - ",   
+				 Integer.toString(Aannee), " - "
+				 );
+
+		Ecran.afficherln(" Date de depart : ", 
+				 Integer.toString(Dheure), "h le ",   
+				 Integer.toString(Djour), " - ", 
+				 Integer.toString(Dmois), " - ",   
+				 Integer.toString(Dannee), " - "   
+				 );
+		Ecran.sautDeLigne();
+	    }
+
+	// FREE
+	BD.fermerResultat(res);
+    }
+  
     static public void main( String Args[] )
     {
 	// CONNEXION PAR UTILISATEUR
@@ -593,11 +654,13 @@ public class Project
 	// DEBUT
 	if(verifieConnexion(user.connexion))
 	    {
-		int menu = -1;
+              if(user.administrateur)
+                {
+                int menu = -1;
 		do
 		    {
 			Ecran.afficherln(" ===== Menu ===== ");
-			Ecran.afficherln(" 1 - Ajouter son hebergement \n 2 - Rechercher un hebergement \n 3 - Réserver un hébergement (lance une recherche) \n 4 - Quitter ");
+			Ecran.afficherln(" 1 - Ajouter son hebergement \n 2 - Rechercher un hebergement \n 3 - Réserver un hébergement (lance une recherche) \n 4 -  Regarder les reservations \n 5 - Quitter ");
 			menu = Clavier.saisirInt();  
 			switch(menu)
 			    {
@@ -606,85 +669,51 @@ public class Project
 				break;
                   
 			    case 2: // Recherche
-				BD.fermerResultat(rechercher(user.connexion).res);
+				BD.fermerResultat(rechercherHebergement(user.connexion).res);
 				break;
                   
 			    case 3: // Reservation
-				reserver(user.connexion);
+				reserver(user);
 				break;
 
-			    case 4 : /* On va sortir de la boucle */ break;
+                            case 4: regarderReservation(user.connexion); break;
+                            case 5 : /* On sort ! */ break;
 			    default:
 				Ecran.afficherln("Mille excuses, mais vous avez du faire une erreur. Recommencez s'il vous plait.");
 				break;
 			    }
-		    }while (menu != 4);
+		    }while (menu != 5);
+                }
+              else
+                {
+		int menu = -1;
+		do
+		    {
+			Ecran.afficherln(" ===== Menu ===== ");
+			Ecran.afficherln(" 1 - Rechercher un hebergement \n 2 - Réserver un hébergement (lance une recherche) \n 3 - Quitter ");
+			menu = Clavier.saisirInt();  
+			switch(menu)
+			    {
+			    case 1: // Recherche
+				BD.fermerResultat(rechercherHebergement(user.connexion).res);
+				break;
+                  
+			    case 2: // Reservation
+				reserver(user);
+				break;
+
+			    case 3 : /* On va sortir de la boucle */ break;
+			    default:
+				Ecran.afficherln("Mille excuses, mais vous avez du faire une erreur. Recommencez s'il vous plait.");
+				break;
+			    }
+		    }while (menu != 3);
 
 		Ecran.afficherln(" * inserer jeu de mot ici* ");
 		BD.fermerConnexion(user.connexion);
-	
+                }
 
 	    }
 
     }
 }
-
-/* TUTORIAL 
-   int maconnexion = BD.ouvrirConnexion(String adresse, String nom_bd, String login, String password);
-
-   void BD.fermerConnexion(int connexion);
-
-   int BD.executerSelect(int connexion, String sql); // Retourne le numéro de la réponse serveur
-   int BD.executerUpdate(int connexion, String sql) // Retourne idem
-   boolean BD.suivant(int res) // return true si ya bien un suivant
-   boolean BD.reinitialiser(int res) // place le cruseur à -1
-   void BD.fermerResultat(int res) // free()
-   String BD.attributString(int res, String att)// Renvoie la valeur de att de l'enregistrement numero res sous forme caractère
-   String BD.attributInt(int res, String att)// Renvoie la valeur de att de l'enregistrement numero res sous forme d'entier
-   long BD.attributLong(int res, String att) // idem en long
-
-   /// DATE
-   long BD.maintenant() // ~ time(NULL)
-   long BD.date(int jour, int mois, int annee, int heures, int minutes, int secondes) // obvious
-        
-   int BD.jour(long d)
-   int BD.mois(long d)
-   int BD.annee(long d)
-   int BD.heures(long d)
-   int BD.minutes(long d)
-   int BD.secondes(long d)
-
-   void BD.pause(int m) // pause la BD
-
-   EXEMPLE :
-   int co = BD.ouvrirConnexion("172.20.XXX.YYY","maBase","monLogin","monMotDePasse");
-   int res = BD.executerSelect(co, "SELECT * FROM maTable");
-   while (BD.suivant(res)) {
-   Ecran.afficher("Valeur de attribut1 (entier) = ", BD.attributInt(res,"attribut1"));
-   Ecran.afficher(" et valeur de attribut2 (chaine) = ", BD.attributString(res,"attribut2"));
-   Ecran.sautDeLigne();
-   }
-   BD.fermerResultat(res);
-   BD.fermerConnexion(co);
-
-   //============== BD
-	
-   msgId : identifiant du message (entier - numéro automatique) - clé primaire de la table
-   msgTexte : texte du message (chaîne - 255 caractères maxi)
-   msgPseudo : pseudo de l'auteur (chaîne - 20 caractères maxi)
-   msgDate : horodatage du message (entier long) 
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-

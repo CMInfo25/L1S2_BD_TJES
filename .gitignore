@@ -1,4 +1,4 @@
-*.class
+Project*.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -13,3 +13,7 @@ hs_err_pid*
 
 #Perso
 *~
+README.tex
+README.md
+README.aux
+README.log
